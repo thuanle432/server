@@ -1,6 +1,6 @@
 
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const pool = require('../config/Database');
 
 exports.register = async (req, res) => {
