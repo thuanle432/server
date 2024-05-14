@@ -16,6 +16,7 @@ router.patch('/successbooking/:id_account', BookingController.successBooking);
 router.get('/listsuccessbooking', BookingController.getSuccessBookingByStatus);
 
 router.get('/checkquantity/:id_tour/:date', BookingController.checkAvailability);
+router.get('/checkexisting/:id_account', BookingController.checkExistingBooking);
 
 
 module.exports = router;

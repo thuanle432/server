@@ -12,13 +12,13 @@ exports.register = async (req, res) => {
         const query = 'INSERT INTO account (username, password, id_role) VALUES (?, ?, ?)';
         pool.query(query, [username, hashedPassword, id_role], (error, results) => {
             if (error) {
-              res.status(500).json({ message: 'Database error: ' + error.sqlMessage });
+              res.status(500).json({ message: 'Dữ liệu thất bại: ' + error.sqlMessage });
               return;
             }
-            res.status(201).json({ message: 'User registered successfully!', userId: results.insertId });
+            res.status(201).json({ message: 'Người dùng đăng ký thành công!', userId: results.insertId });
         });
     } catch (error) {
-      res.status(500).json({ message: 'Server error: ' + error.message });
+      res.status(500).json({ message: 'Lỗi sever: ' + error.message });
     }
 };
 
@@ -29,12 +29,12 @@ exports.login = async (req, res) => {
         const query = 'SELECT id_account, username, password, id_role FROM account WHERE username = ?';
         pool.query(query, [username], async (error, results) => {
             if (error) {
-                res.status(500).json({ message: 'Database error: ' + error.sqlMessage });
+                res.status(500).json({ message: 'Cơ sở dữ liệu thất bại: ' + error.sqlMessage });
                 return;
             }
             
             if (results.length === 0) {
-                res.status(401).json({ message: 'Invalid username or password' });
+                res.status(401).json({ message: 'Không được đẻ trống' });
                 return;
             }
             
@@ -42,16 +42,16 @@ exports.login = async (req, res) => {
             const passwordIsValid = await bcrypt.compare(password, user.password);
             
             if (!passwordIsValid) {
-                res.status(401).json({ message: 'Invalid username or password' });
+                res.status(401).json({ message: 'Tên đăng nhập không được để trống' });
                 return;
             }
             res.status(200).json({
-                message: 'User logged in successfully!',
+                message: 'Đăng nhập thành công',
                 userId: user.id_account,
                 id_role: user.id_role
                 });
         });
     } catch (error) {
-        res.status(500).json({ message: 'Server error: ' + error.message });
+        res.status(500).json({ message: 'Lỗi server : ' + error.message });
     }
 };

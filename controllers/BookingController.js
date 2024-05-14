@@ -1,10 +1,29 @@
 const pool = require('../config/Database');
 
-exports.saveBooking = (req, res) => {
+exports.saveBooking = async (req, res) => {
     const { id_account, formData, tourId, name_tour, price, itinerary, includes, excludes } = req.body;
-    const status = formData.status || 1; 
+    const status = formData.status || 1;
 
-    console.log("Received status:", status); 
+    console.log("Received status:", status);
+
+    const activeBookingQuery = `
+        SELECT COUNT(*) as activeCount FROM bookings 
+        WHERE id_account = ? AND status IN (2, 3);
+    `;
+    
+    const activeBookingResult = await new Promise((resolve, reject) => {
+        pool.query(activeBookingQuery, [id_account], (err, results) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(results[0].activeCount > 0);
+            }
+        });
+    });
+
+    if (activeBookingResult) {
+        return res.status(400).send('Anda sudah memiliki pemesanan dengan status 2 atau 3 yang masih aktif dan tidak dapat membuat pemesanan baru.');
+    }
 
     const query = `
         INSERT INTO bookings (id_account, id_tour, name, email, phone_number, people, date, name_tour, price, itinerary, includes, excludes, status)
@@ -24,6 +43,8 @@ exports.saveBooking = (req, res) => {
         res.send('Booking data saved successfully');
     });
 };
+
+
 
 exports.getBookingsByUser = (req, res) => {
     const { id_account } = req.params;
@@ -147,5 +168,25 @@ exports.checkAvailability = (req, res) => {
             const isAvailable = uniqueAccounts.size < maxQuantity;
             res.json({ isAvailable });
         });
+    });
+};
+
+
+exports.checkExistingBooking = (req, res) => {
+    const { id_account } = req.params;
+
+    const query = `
+        SELECT COUNT(*) as count FROM bookings 
+        WHERE id_account = ? AND status IN (1, 2, 3);
+    `;
+
+    pool.query(query, [id_account], (err, results) => {
+        if (err) {
+            console.error('Failed to check existing bookings:', err);
+            return res.status(500).send('Server error while checking for existing bookings');
+        }
+        
+        const hasActiveBooking = results[0].count > 0;
+        res.json({ exists: hasActiveBooking });
     });
 };

@@ -9,7 +9,7 @@ const TourRouter = require('./routes/TourRouter')
 const app = express();
 const port = 3001;
 app.get("/", (req, res)=>{
-        res.send("Hello server")
+    res.send("Hello server")
 })
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(cors());

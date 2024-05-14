@@ -1,5 +1,4 @@
 const pool = require('../config/Database');
-
 exports.addTourDetail = (req, res) => {
     const { description, highlights, itinerary, includes, excludes } = req.body;
     const insertSql = 'INSERT INTO detail (description, highlights, itinerary, includes, excludes) VALUES (?, ?, ?, ?, ?)';
